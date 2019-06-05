@@ -19,7 +19,7 @@ import (
 
 // Factory configures and returns Covert backends
 func Factory(ctx context.Context, conf *logical.BackendConfig) (logical.Backend, error) {
-	b := &CovertBackend{
+	b := &backend{
 		store: make(map[string][]byte),
 	}
 
@@ -39,14 +39,14 @@ func Factory(ctx context.Context, conf *logical.BackendConfig) (logical.Backend,
 	return b, nil
 }
 
-// CovertBackend is used for storing secrets in a file
-type CovertBackend struct {
+// backend wraps the backend framework and adds a map for storing key value pairs
+type backend struct {
 	*framework.Backend
 
 	store map[string][]byte
 }
 
-func (b *CovertBackend) paths() []*framework.Path {
+func (b *backend) paths() []*framework.Path {
 	return []*framework.Path{
 		{
 			Pattern: framework.MatchAllRegex("path"),
@@ -81,7 +81,7 @@ func (b *CovertBackend) paths() []*framework.Path {
 	}
 }
 
-func (b *CovertBackend) handleExistenceCheck(ctx context.Context, req *logical.Request, data *framework.FieldData) (bool, error) {
+func (b *backend) handleExistenceCheck(ctx context.Context, req *logical.Request, data *framework.FieldData) (bool, error) {
 	out, err := req.Storage.Get(ctx, req.Path)
 	if err != nil {
 		return false, errwrap.Wrapf("existence check failed: {{err}}", err)
@@ -90,7 +90,7 @@ func (b *CovertBackend) handleExistenceCheck(ctx context.Context, req *logical.R
 	return out != nil, nil
 }
 
-func (b *CovertBackend) handleRead(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+func (b *backend) handleRead(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	if req.ClientToken == "" {
 		return nil, fmt.Errorf("client token empty")
 	}
@@ -111,7 +111,7 @@ func (b *CovertBackend) handleRead(ctx context.Context, req *logical.Request, da
 	return resp, nil
 }
 
-func (b *CovertBackend) handleWrite(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+func (b *backend) handleWrite(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	if req.ClientToken == "" {
 		return nil, fmt.Errorf("client token empty")
 	}
@@ -135,7 +135,7 @@ func (b *CovertBackend) handleWrite(ctx context.Context, req *logical.Request, d
 	return nil, nil
 }
 
-func (b *CovertBackend) handleDelete(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
+func (b *backend) handleDelete(ctx context.Context, req *logical.Request, data *framework.FieldData) (*logical.Response, error) {
 	if req.ClientToken == "" {
 		return nil, fmt.Errorf("client token empty")
 	}
