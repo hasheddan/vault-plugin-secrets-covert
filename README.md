@@ -1,5 +1,9 @@
 # Vault Covert Secrets Plugin
 
+**NOTICE:** This repo was donated to [HashiCorp's Vault Guides](https://github.com/hashicorp/vault-guides). It will continue to be maintained there in the `secrets/mock` directory.
+
+---
+
 Covert is an exmaple secrets engine plugin for [HashiCorp Vault](https://www.vaultproject.io/). It is meant for demonstration purposes only and should never be used in production.
 
 ## Usage
